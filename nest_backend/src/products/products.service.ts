@@ -25,21 +25,44 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto) {
-    return this.prisma.product.create({
-      data: dto,
-      include: {
-        category: true,
-      },
+    return this.prisma.$transaction(async (transaction) => {
+      const product = await transaction.product.create({
+        data: dto,
+      });
+
+      await transaction.stock.create({
+        data: {
+          productId: product.id,
+          quantity: product.quantity,
+        },
+      });
+
+      return transaction.product.findUniqueOrThrow({
+        where: { id: product.id },
+        include: { category: true },
+      });
     });
   }
 
   async update(id: number, dto: UpdateProductDto) {
-    return this.prisma.product.update({
-      where: { id },
-      data: dto,
-      include: {
-        category: true,
-      },
+    return this.prisma.$transaction(async (transaction) => {
+      const product = await transaction.product.update({
+        where: { id },
+        data: dto,
+      });
+
+      if (dto.quantity !== undefined) {
+        await transaction.stock.upsert({
+          where: { productId: id },
+          create: { productId: id, quantity: product.quantity },
+          update: { quantity: product.quantity },
+        });
+      }
+
+      return transaction.product.findUniqueOrThrow({
+        where: { id },
+        include: { category: true },
+      });
     });
   }
 

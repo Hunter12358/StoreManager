@@ -61,4 +61,20 @@ class ProductService {
 
     return Product.fromJson(response.data);
   }
+
+  Future<Product> adjustStock({
+    required int id,
+    required int quantityChange,
+    required String reason,
+  }) async {
+    final response = await _api.dio.patch(
+      '/stock/$id',
+      data: {
+        'quantityChange': quantityChange,
+        'reason': reason,
+      },
+    );
+
+    return Product.fromJson(response.data);
+  }
 }

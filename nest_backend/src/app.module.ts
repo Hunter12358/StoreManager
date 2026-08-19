@@ -7,12 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { StockModule } from './stock/stock.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
   }),
-    PrismaModule, UsersModule, AuthModule, CategoriesModule, ProductsModule],
+    PrismaModule, UsersModule, AuthModule, CategoriesModule, ProductsModule,
+    StockModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -7,6 +7,7 @@ import 'package:store_manager/features/categories/screens/category_form_screen.d
 import 'package:store_manager/features/dashboard/screens/dashboard_screen.dart';
 import 'package:store_manager/features/pos/screens/pos_screen.dart';
 import 'package:store_manager/features/products/screens/product_form_screen.dart';
+import 'package:store_manager/features/products/screens/product_detail_screen.dart';
 import 'package:store_manager/features/products/screens/products_screen.dart';
 
 final _storage = StorageService();
@@ -38,6 +39,7 @@ final appRouter = GoRouter(
       if (state.matchedLocation == '/dashboard' ||
           state.matchedLocation == '/categories' ||
           state.matchedLocation == '/products' ||
+          state.matchedLocation.contains('/products/') ||
           state.matchedLocation == '/categories/new' ||
           state.matchedLocation.contains('/categories/')) {
         return '/pos';
@@ -87,6 +89,15 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/products/new',
       builder: (context, state) => const ProductFormScreen(),
+    ),
+
+    GoRoute(
+      path: '/products/:id',
+      builder: (context, state) {
+        final id = int.parse(state.pathParameters['id']!);
+
+        return ProductDetailScreen(productId: id);
+      },
     ),
 
     GoRoute(

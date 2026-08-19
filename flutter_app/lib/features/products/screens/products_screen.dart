@@ -93,7 +93,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       rows: products.map((product) {
                         return DataRow(
                           cells: [
-                            DataCell(Text(product.name)),
+                            DataCell(
+                              InkWell(
+                                onTap: () => context.push('/products/${product.id}'),
+                                child: Text(
+                                  product.name,
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ),
                             DataCell(Text(product.categoryName)),
                             DataCell(Text(product.unit)),
                             DataCell(

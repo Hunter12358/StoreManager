@@ -1,0 +1,1 @@
+ALTER TABLE `Stock` ADD COLUMN `reason` VARCHAR(191) NULL;
