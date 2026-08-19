@@ -5,6 +5,8 @@ import '../../layout/screens/app_shell.dart';
 import '../models/product.dart';
 import '../services/product_service.dart';
 
+const lowStockThreshold = 10;
+
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
@@ -97,7 +99,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             DataCell(
                               Text(product.sellingPrice.toStringAsFixed(2)),
                             ),
-                            DataCell(Text(product.quantity.toString())),
+                            DataCell(
+                              Text(
+                                product.quantity.toString(),
+                                style: product.quantity <= lowStockThreshold
+                                    ? const TextStyle(color: Colors.orange)
+                                    : null,
+                              ),
+                            ),
                             DataCell(
                               Row(
                                 mainAxisSize: MainAxisSize.min,
