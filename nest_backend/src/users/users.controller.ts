@@ -5,7 +5,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Role } from '@prisma/client';
 import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { RolesGuard } from '../auth/roles.guard';
 
 @Controller('users')
 export class UsersController {

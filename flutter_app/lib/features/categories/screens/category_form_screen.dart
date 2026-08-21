@@ -15,8 +15,6 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  bool _isLoading = false;
-
   final _service = CategoryService();
 
   final _formKey = GlobalKey<FormState>();
@@ -33,20 +31,12 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   }
 
   Future<void> _loadCategory() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     final category = await _service.getCategory(widget.categoryId!);
 
     _nameController.text = category.name;
     _descriptionController.text = category.description ?? '';
 
     if (!mounted) return;
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _save() async {

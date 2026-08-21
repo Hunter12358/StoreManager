@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:store_manager/features/auth/services/auth_service.dart';
 
@@ -14,6 +15,16 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
+  String? _errorMessage;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -76,28 +87,53 @@ class _LoginFormState extends State<LoginForm> {
 
                   const SizedBox(height: 25),
 
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        if (!_formKey.currentState!.validate()) {
-                          return;
-                        }
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                              if (!_formKey.currentState!.validate()) {
+                                return;
+                              }
 
-                        try {
-                          await _authService.login(
-                            email: _emailController.text,
-                            password: _passwordController.text,
-                          );
+                              setState(() {
+                                _isLoading = true;
+                                _errorMessage = null;
+                              });
 
-                          print('Login successful');
+                              try {
+                                await _authService.login(
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text,
+                                );
 
-                          context.go('/dashboard');
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                      child: const Text('Login'),
+                                if (!context.mounted) return;
+                                context.go('/dashboard');
+                              } catch (error) {
+                                if (mounted) {
+                                  setState(() {
+                                    _errorMessage = _getErrorMessage(error);
+                                  });
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                }
+                              }
+                            },
+                      child: Text(_isLoading ? 'Signing in...' : 'Login'),
                     ),
                   ),
                 ],
@@ -107,5 +143,26 @@ class _LoginFormState extends State<LoginForm> {
         ),
       ),
     );
+  }
+
+  String _getErrorMessage(Object error) {
+    if (error is DioException) {
+      if (error.type == DioExceptionType.connectionError ||
+          error.type == DioExceptionType.connectionTimeout) {
+        return 'Unable to connect to the server. Start the backend and try again.';
+      }
+
+      final responseMessage = error.response?.data is Map
+          ? error.response?.data['message']
+          : null;
+      if (responseMessage is String) {
+        return responseMessage;
+      }
+      if (responseMessage is List && responseMessage.isNotEmpty) {
+        return responseMessage.join(', ');
+      }
+    }
+
+    return 'Login failed. Please check your details and try again.';
   }
 }

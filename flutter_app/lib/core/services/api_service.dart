@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import 'storage_service.dart';
 
@@ -7,7 +8,7 @@ class ApiService {
 
   ApiService() : dio = Dio(
     BaseOptions(
-      baseUrl: 'http://localhost:3000',
+      baseUrl: _baseUrl,
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 5),
       headers: {
@@ -28,5 +29,13 @@ class ApiService {
         },
       ),
     );
+  }
+
+  static String get _baseUrl {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return 'http://localhost:3000';
+    }
+
+    return 'http://10.0.2.2:3000';
   }
 }

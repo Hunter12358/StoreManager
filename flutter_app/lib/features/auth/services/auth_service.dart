@@ -24,6 +24,7 @@ class AuthService {
 
     await storage.saveToken(token);
     await storage.saveRole(profile.role);
+    await storage.saveUserId(profile.userId);
 
     return token;
   }

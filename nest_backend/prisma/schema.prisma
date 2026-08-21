@@ -19,6 +19,7 @@ model User {
   password  String
   role      Role     @default(CASHIER)
   createdAt DateTime @default(now())
+  sales     Sale[]
 }
 
 
@@ -38,6 +39,7 @@ model Product {
   categoryId   Int
   category     Category @relation(fields: [categoryId], references: [id])
   stock        Stock?
+  saleItems    SaleItem[]
   createdAt    DateTime @default(now())
 }
 
@@ -48,4 +50,29 @@ model Stock {
   reason    String?
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   updatedAt DateTime @updatedAt
+}
+
+model Sale {
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  total     Decimal    @db.Decimal(65, 30)
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+  items     SaleItem[]
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id        Int      @id @default(autoincrement())
+  saleId    Int
+  productId Int
+  quantity  Int
+  unitPrice Decimal  @db.Decimal(65, 30)
+  sale      Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([saleId])
+  @@map("sale_items")
 }
